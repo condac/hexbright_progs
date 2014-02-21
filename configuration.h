@@ -1,9 +1,11 @@
 
+#define PULLUP                  1  //do we need pull up resistor on the switch???
 
 #define OVERTEMP                340 
+#define POWEROFF_TIME           4000 // 4s press of the button will power off
 // Digital Pins
-                                //0 serial pin
-                                //1 serial pin
+                                //0 serial tx pin
+                                //1 serial rx pin
 #define RED_LED_PIN            2
 #define SW_PIN            2
                                 //3 unknown

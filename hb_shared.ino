@@ -1,5 +1,8 @@
 boolean serial = false;
 
+int btnBounce = 10;
+boolean btnState = false;
+unsigned long btnTime;
 
 void setLight(int pwm, boolean high) {
   //Set the output for the light
@@ -41,4 +44,48 @@ void serialStart() { //Only start serial if we are connected to computer
   Serial.begin(9600);
     serial = true;
     Serial.println("Connected!");
+}
+
+int readSwitch() {
+  // To be able to read the time we press the switch this function is called every loop to calculate what to do when the button is pressed
+  // Once the button is released it will put out a time how long the button was pressed
+  // while the button is pressed it will return 1
+  pinMode(SW_PIN,INPUT);
+  digitalWrite(SW_PIN,PULLUP);
+  
+  if (digitalRead(SW_PIN)) {
+    if (btnState) {
+      //The button was pressed before and is still pressed
+      
+      //Maybe insert power off function here?
+      if (time-btnTime >POWEROFF_TIME) {
+        //Power off
+        sprintln("power off");
+        delay(1);
+        setPower(false);
+      return 1;
+    }
+    else {
+      // The button was NOT pressed before and is now being pressed
+      btnState = true;
+      btnTime = time;
+      delay(btnBounce); // in case there is button bounching
+      sprintln("Button pressed");
+    }
+    
+  }
+  else {
+    if (btnState) {
+      // The button was pressed and have now been released
+      int out = (int) ( time-btnTime );
+      sprint("Button released: ");
+      sprint(""+out);
+      sprintln("ms");
+      return out;
+    }
+    else {
+      // The button is not pressed
+      return 0;
+    }
+  }
 }
