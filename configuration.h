@@ -13,7 +13,7 @@
 #define GREEN_LED_PIN               5
                                 //6 unknown
                                 //7 unknown
-#define PWR_PIN                8
+#define PWR_PIN                13 //8
 #define LED_DRIVER_PIN           9
 #define LED_PWM_PIN             10
                                 //11 unknown

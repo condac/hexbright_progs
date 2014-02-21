@@ -3,6 +3,7 @@ boolean serial = false;
 int btnBounce = 10;
 boolean btnState = false;
 unsigned long btnTime;
+unsigned long ett = 1;
 
 void setLight(int pwm, boolean high) {
   //Set the output for the light
@@ -19,7 +20,13 @@ void setLight(int pwm, boolean high) {
 }
 
 void setPower(boolean in) { //takes true or false and power up or down the flashlight
-  
+  if (in) {
+    pinMode(PWR_PIN, OUTPUT);
+    digitalWrite(PWR_PIN, HIGH);
+  }
+  else {
+    digitalWrite(PWR_PIN, LOW);
+  }
   
 }
 
@@ -40,6 +47,16 @@ void sprint(String in) {
     Serial.print(in);
   }
 }
+void sprint(unsigned long in) {
+  if (serial) {
+    Serial.print(in);
+  }
+}
+void sprintln(unsigned long in) {
+  if (serial) {
+    Serial.print(in);
+  }
+}
 void serialStart() { //Only start serial if we are connected to computer
   Serial.begin(9600);
     serial = true;
@@ -53,7 +70,7 @@ int readSwitch() {
   pinMode(SW_PIN,INPUT);
   digitalWrite(SW_PIN,PULLUP);
   
-  if (digitalRead(SW_PIN)) {
+  if (!digitalRead(SW_PIN)) {
     if (btnState) {
       //The button was pressed before and is still pressed
       
@@ -63,24 +80,35 @@ int readSwitch() {
         sprintln("power off");
         delay(1);
         setPower(false);
-      return 1;
+      }
+      // return the negative value of time the button is pressed while it being pressed.
+      int out = btnTime - time;
+      return out;
     }
     else {
       // The button was NOT pressed before and is now being pressed
-      btnState = true;
-      btnTime = time;
+      
       delay(btnBounce); // in case there is button bounching
+      if (!digitalRead(SW_PIN)) {
+      btnState = true;
+      btnTime = millis();
       sprintln("Button pressed");
+      }
+      else {
+        sprintln("Button bounce");
+      
+      }
     }
     
   }
   else {
     if (btnState) {
       // The button was pressed and have now been released
-      int out = (int) ( time-btnTime );
+      unsigned long out = time-btnTime ;
       sprint("Button released: ");
-      sprint(""+out);
+      sprint(out);
       sprintln("ms");
+      btnState = false;
       return out;
     }
     else {
@@ -88,4 +116,5 @@ int readSwitch() {
       return 0;
     }
   }
+  return 0;
 }
