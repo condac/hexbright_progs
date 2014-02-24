@@ -1,3 +1,5 @@
+
+
 #include "configuration.h"
 
 // Modes
@@ -9,14 +11,13 @@
 #define MODE_BEACON             5
 int maxMode           =         5;
 
-extern boolean serial;
 unsigned long time;
 int mode = 0;
 
 void setup() {
-  pinMode(PWR_PIN, OUTPUT);
-  digitalWrite(PWR_PIN, LOW);
-  // use standard setup function from example
+   // If we leave the regulator's enable pin as high-impedance,
+  // the regulator will power down the board about a half 
+  // second after release of the button.
   pinMode(PWR_PIN,INPUT);
   digitalWrite(PWR_PIN, LOW);
 
@@ -28,7 +29,7 @@ void setup() {
   digitalWrite(LED_DRIVER_PIN, LOW);
   digitalWrite(LED_PWM_PIN,   LOW);
   
-  if (!digitalRead(SW_PIN)) { // If the Switch is pressed at this state the flashlight is turned on by the user, 
+  if (INVERT_SW == digitalRead(SW_PIN)) { // If the Switch is pressed at this state the flashlight is turned on by the user, 
     setPower(true);
   }
   else { // if not its is turned on by connecting the usb to power to a computer or charger
@@ -72,7 +73,6 @@ void loop() {
     }
   }
   
-
   modeCase(); // 
 }
   

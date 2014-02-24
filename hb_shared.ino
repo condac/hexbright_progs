@@ -1,4 +1,6 @@
-
+// ######################################################################################
+// This file contains common used functions.
+// ######################################################################################
 int btnBounce = 10; // the minimum pressed time on the button in ms
 boolean btnState = false;
 unsigned long btnTime;
@@ -30,20 +32,38 @@ void setPower(boolean in) { //takes true or false and power up or down the flash
     digitalWrite(PWR_PIN, HIGH);
   }
   else {
+    pinMode(PWR_PIN, OUTPUT);
     digitalWrite(PWR_PIN, LOW);
   }
-  
 }
 
 void heatProtection() {
-  
-  if (analogRead(TEMP_PIN)>OVERTEMP) {
+  int temp = analogRead(TEMP_PIN);
+  if (temp>OVERTEMP) {
     if (DEBUG) Serial.println("Overheat!");
     setLight(0,false);
   }
-  
+  if (DEBUG) Serial.print("temp: ");
+  if (DEBUG) Serial.println(temp);
 }
 
+void checkCharge() {
+  // Copy from factory example
+  // Check the state of the charge controller
+  int chargeState = analogRead(APIN_CHARGE);
+  if (chargeState < 128)  // Low - charging
+  {
+    digitalWrite(DPIN_GLED, (time&0x0100)?LOW:HIGH);
+  }
+  else if (chargeState > 768) // High - charged
+  {
+    digitalWrite(DPIN_GLED, HIGH);
+  }
+  else // Hi-Z - shutdown
+  {
+    digitalWrite(DPIN_GLED, LOW);    
+  }
+}
 
 int readSwitch() {
   // To be able to read the time we press the switch this function is called every loop to calculate what to do when the button is pressed
@@ -100,3 +120,8 @@ int readSwitch() {
   }
   return 0; // unreachable if everything is right. 
 }
+
+int readAcc() { // TODO: read the accelerometer
+  
+}
+
