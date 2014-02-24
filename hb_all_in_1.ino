@@ -32,8 +32,10 @@ void setup() {
     setPower(true);
   }
   else { // if not its is turned on by connecting the usb to power to a computer or charger
-    serialStart(); //Only start serial if we are connected to computer
-    serial=true;
+    if (DEBUG) {
+      Serial.begin(9600);
+      Serial.println("Connected!");
+    }
   }
   
 }
@@ -43,26 +45,27 @@ void loop() {
   
   //digitalWrite(PWR_PIN, (time&0x03FF)?LOW:HIGH );
   
-  long buttonTime = readSwitch();
-  if (buttonTime < 0 && buttonTime > -1000) {
-    digitalWrite(GREEN_LED_PIN,HIGH);
-  }
-  else if (buttonTime < -(POWEROFF_TIME-500) && buttonTime > -POWEROFF_TIME) {
-    digitalWrite(GREEN_LED_PIN, ((time/10)&0x000F)?LOW:HIGH );
+  long buttonTime = readSwitch(); // readSwitch returns the state of the button, negative value is the current time the button is being pressed
+                                  // once the button is released it returns the time it was pressed as a positive number
+                                  // if not pressed it returns 0
+                                  // we use the negative value to make the green light flash diffrent depending on how long the button is pressed
+                                  // to give feedback so the user know when he can release the button for diffrent modes
+  
+  if (buttonTime < 0) {
+    buttonDown(buttonTime);
   }
   else if (buttonTime == 0 ) { // no button is pressed
-    // Blink the green indicator LED now and then
-    digitalWrite(GREEN_LED_PIN, (time&0x03FF)?LOW:HIGH );
-  }else {
-    digitalWrite(GREEN_LED_PIN,LOW);
+ 
+    digitalWrite(GREEN_LED_PIN, (time&0x03FF)?LOW:HIGH );   // Blink the green indicator LED now and then
   }
-  if (buttonTime > 1000) { //Simple cycle through modes
+  
+  if (buttonTime > 1000) { // If the button is pressed for more than 1s it goes to low light moon mode. 
       mode = MODE_MOON;
   }
   else if (buttonTime > 50) { //Simple cycle through modes
     mode++;
-    sprint("modechanged");
-    sprintln(buttonTime);
+    if (DEBUG) Serial.print("modechanged");
+    if (DEBUG) Serial.println(buttonTime);
     
     if (mode>maxMode) {
       mode = 0;
@@ -70,9 +73,22 @@ void loop() {
   }
   
 
-  modeCase();
+  modeCase(); // 
 }
   
+void buttonDown(long buttonTime) {
+  
+  if (buttonTime < 0 && buttonTime > -1000) { // the green light is on for 1s
+    digitalWrite(GREEN_LED_PIN,HIGH);
+  }
+  else if (buttonTime < -(POWEROFF_TIME-500) && buttonTime > -POWEROFF_TIME) { // 0.5s before the light is powerd down the green light flashes rapidly
+    digitalWrite(GREEN_LED_PIN, ((time/10)&0x000F)?LOW:HIGH );
+  }
+  else {
+    digitalWrite(GREEN_LED_PIN,LOW);
+  }
+  
+}
 void modeCase() {
   switch (mode)
   {

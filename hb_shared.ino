@@ -1,5 +1,3 @@
-boolean serial = false;
-
 int btnBounce = 10;
 boolean btnState = false;
 unsigned long btnTime;
@@ -32,36 +30,12 @@ void setPower(boolean in) { //takes true or false and power up or down the flash
 
 void heatProtection() {
   if (analogRead(TEMP_PIN)>OVERTEMP) {
-    sprintln("Overheat!");
+    if (DEBUG) Serial.println("Overheat!");
     setLight(0,false);
   }
   
 }
-void sprintln(String in) {
-  if (serial) {
-    Serial.println(in);
-  }
-}
-void sprint(String in) {
-  if (serial) {
-    Serial.print(in);
-  }
-}
-void sprint(unsigned long in) {
-  if (serial) {
-    Serial.print(in);
-  }
-}
-void sprintln(unsigned long in) {
-  if (serial) {
-    Serial.print(in);
-  }
-}
-void serialStart() { //Only start serial if we are connected to computer
-  Serial.begin(9600);
-    serial = true;
-    Serial.println("Connected!");
-}
+
 
 int readSwitch() {
   // To be able to read the time we press the switch this function is called every loop to calculate what to do when the button is pressed
@@ -77,7 +51,7 @@ int readSwitch() {
       //Maybe insert power off function here?
       if (time-btnTime >POWEROFF_TIME) {
         //Power off
-        sprintln("power off");
+        if (DEBUG) Serial.println("power off");
         delay(1);
         setPower(false);
       }
@@ -92,10 +66,10 @@ int readSwitch() {
       if (!digitalRead(SW_PIN)) {
       btnState = true;
       btnTime = millis();
-      sprintln("Button pressed");
+      if (DEBUG) Serial.println("Button pressed");
       }
       else {
-        sprintln("Button bounce");
+        if (DEBUG) Serial.println("Button bounce");
       
       }
     }
@@ -105,9 +79,9 @@ int readSwitch() {
     if (btnState) {
       // The button was pressed and have now been released
       unsigned long out = time-btnTime ;
-      sprint("Button released: ");
-      sprint(out);
-      sprintln("ms");
+      if (DEBUG) Serial.print("Button released: ");
+      if (DEBUG) Serial.print(out);
+      if (DEBUG) Serial.println("ms");
       btnState = false;
       return out;
     }

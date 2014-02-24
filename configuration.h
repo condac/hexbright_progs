@@ -1,3 +1,4 @@
+#define DEBUG                   1 // Debug controlls serial output
 
 #define PULLUP                  1  //do we need pull up resistor on the switch???
 
@@ -6,15 +7,15 @@
 // Digital Pins
                                 //0 serial tx pin
                                 //1 serial rx pin
-#define RED_LED_PIN            2
-#define SW_PIN            2
+#define RED_LED_PIN             2
+#define SW_PIN                  2
                                 //3 unknown
                                 //4 unknown
-#define GREEN_LED_PIN               5
+#define GREEN_LED_PIN           5
                                 //6 unknown
                                 //7 unknown
-#define PWR_PIN                13 //8
-#define LED_DRIVER_PIN           9
+#define PWR_PIN                 13 //8
+#define LED_DRIVER_PIN          9
 #define LED_PWM_PIN             10
                                 //11 unknown
                                 //12 unknown
