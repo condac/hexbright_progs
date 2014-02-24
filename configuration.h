@@ -1,7 +1,7 @@
 #define DEBUG                   1 // Debug controlls serial output
 
 #define PULLUP                  1  //do we need pull up resistor on the switch???
-
+#define INVERT_SW               0  // Is the switch inverted or not
 #define OVERTEMP                340 
 #define POWEROFF_TIME           4000 // 4s press of the button will power off
 // Digital Pins
