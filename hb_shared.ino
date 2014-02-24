@@ -5,6 +5,7 @@ int btnBounce = 10; // the minimum pressed time on the button in ms
 boolean btnState = false;
 unsigned long btnTime;
 unsigned long ett = 1;
+extern int mode;
 
 void setLight(int pwm, boolean high) {
   // Set the output for the light
@@ -42,6 +43,10 @@ void heatProtection() {
   if (temp>OVERTEMP) {
     if (DEBUG) Serial.println("Overheat!");
     setLight(0,false);
+    mode = 0;
+    for (int i=100;i>0;i--) { // not often you see a for loop with i--
+      setLight(i,false);
+    }
   }
   if (DEBUG) Serial.print("temp: ");
   if (DEBUG) Serial.println(temp);

@@ -4,7 +4,7 @@
 extern unsigned long time;
 int moonCounter = 0;
 boolean flipp;
-
+extern int mode;
 
 void beacon() { // creates a light pulse every second
   if ((time&0x03FF)?0:1) {
