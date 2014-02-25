@@ -9,7 +9,8 @@
 #define MODE_HIGH               3
 #define MODE_STROBE             4
 #define MODE_BEACON             5
-int maxMode           =         5;
+#define MODE_DISCO              6
+int maxMode           =         6;
 
 unsigned long time;
 int mode = 0;
@@ -38,7 +39,7 @@ void setup() {
       Serial.println("Connected!");
     }
   }
-  
+  startAcc();
 }
 
 void loop() {
@@ -73,6 +74,7 @@ void loop() {
     }
   }
   
+  loopAcc();
   modeCase(); // 
 }
   

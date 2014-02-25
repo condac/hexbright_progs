@@ -42,9 +42,9 @@ int pulse = 10000; //how many ms long the strobe pulse is
 void strobe() {
   if (timeWait1<time) {
     timeWait1 = time + delay1;
-    setLight(255,1);
+    setLightFast(255,1);
     delayMicroseconds(pulse);
-    setLight(0,0);
+    setLightFast(0,0);
   }
   if (timeWait2<time) {
     timeWait2 = time + delay2;
@@ -52,4 +52,25 @@ void strobe() {
     delayMicroseconds(pulse);
     //setLight(0,0);
   }
+}
+
+// ######################################################################################
+// DISCO-mode by condac "patent pending"
+// ######################################################################################
+
+void disco() {
+  extern int x;
+  extern int y;
+  extern int z;
+  int ax = abs(x);
+  int ay = abs(y);
+  int az = abs(z);
+      
+  int totalForce;
+  int intensity;
+  
+  totalForce = ax+ay+az; // At rest this should add up to 21.33 (but we dont have decimals of cource)
+  
+  intensity = totalForce - 21;
+  
 }
