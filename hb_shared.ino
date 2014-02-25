@@ -44,6 +44,10 @@ void setLightFast(int pwm, boolean high) { // The digitalWrite function is by de
   OCR1B = pwm;
 }
 
+void setPWM(int pwm) { // Set only PWM don't bother with the driver
+  OCR1B = pwm;
+}
+
 void setPower(boolean in) { //takes true or false and power up or down the flashlight
   // Not tested
   if (in) {

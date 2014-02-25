@@ -71,6 +71,23 @@ void disco() {
   
   totalForce = ax+ay+az; // At rest this should add up to 21.33 (but we dont have decimals of cource)
   
-  intensity = totalForce - 21;
+  intensity = (totalForce-21)*10;
+  
+  if (intensity>255) {
+    intensity = 255;
+  }
+  if (intensity <0) {
+    // BlinkMode
+    intensity = abs(intensity);
+    if (intensity>255) {
+      intensity = 255;
+    }
+    setLight(intensity,1);
+    delay(1);
+    setLight(0,1);
+  }
+  else {
+    setLightFast(intensity,1);
+  }
   
 }
