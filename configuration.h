@@ -1,9 +1,9 @@
 #define DEBUG                   1 // Debug controlls serial output
 
-#define PULLUP                  1  //do we need pull up resistor on the switch???
-#define INVERT_SW               0  // Is the switch inverted or not
+#define PULLUP                  0  //do we need pull up resistor on the switch???
+#define INVERT_SW               1  // Is the switch inverted or not
 #define OVERTEMP                340 
-#define POWEROFF_TIME           4000 // 4s press of the button will power off
+#define POWEROFF_TIME           3000 // 4s press of the button will power off
 // Digital Pins
                                 //0 serial tx pin
                                 //1 serial rx pin
@@ -14,7 +14,7 @@
 #define GREEN_LED_PIN           5
                                 //6 unknown
                                 //7 unknown
-#define PWR_PIN                 13 //8
+#define PWR_PIN                 8 //8
 #define LED_DRIVER_PIN          9
 #define LED_PWM_PIN             10
                                 //11 unknown
@@ -43,4 +43,10 @@
 #define MMA7660_PDET  0x09
 #define MMA7660_PD    0x0A
 
-
+#define ACC_ADDRESS             0x4C
+#define ACC_REG_XOUT            0
+#define ACC_REG_YOUT            1
+#define ACC_REG_ZOUT            2
+#define ACC_REG_TILT            3
+#define ACC_REG_INTS            6
+#define ACC_REG_MODE            7

@@ -3,6 +3,19 @@
 // ######################################################################################
 
 #include <Wire.h>
+#include <compat/twi.h>
+
+#ifndef TWI_BUFFER_LENGTH
+#define TWI_BUFFER_LENGTH 6 // for hexbright, our maximum rx/tx buffer size is 6
+#endif
+#define TWI_READY 0
+  #define TWI_MRX   1
+  #define TWI_MTX   2
+  #define TWI_SRX   3
+  #define TWI_STX   4
+
+#define 	TW_READ   1
+#define 	TW_WRITE   0
 
 extern unsigned long time;
 int btnBounce = 10; // the minimum pressed time on the button in ms
@@ -13,6 +26,12 @@ extern int mode;
 int x;
 int y;
 int z;
+unsigned char tilt = 0;
+int vectors[] = {0,0,0, 0,0,0, 0,0,0, 0,0,0};
+int current_vector = 0;
+unsigned char num_vectors = 4;
+int down_vector[] = {0,0,0};
+
 
 void setLight(int pwm, boolean high) {
   // Set the output for the light
@@ -23,7 +42,12 @@ void setLight(int pwm, boolean high) {
   // 500 Lumens PWM 255 Driver 1
   // 175 Lumens PWM 255 Driver 0
   // 50  Lumens PWM 64  Driver 0
-  
+  if (pwm>255) {
+    pwm = 255;
+  }
+  if (pwm <0) {
+    pwm = 0;
+  }
   if (high) { 
     digitalWrite(LED_DRIVER_PIN, HIGH);
   }
@@ -33,6 +57,15 @@ void setLight(int pwm, boolean high) {
   analogWrite(LED_PWM_PIN, pwm);  
 }
 
+void setLight(int in) {
+  if (in>255) {
+    in = in-255+70;
+    setLight(in,1);
+  }
+  else {
+    setLight(in,0);
+  }
+}
 void setLightFast(int pwm, boolean high) { // The digitalWrite function is by design very slow compared to what it is posible in the hardware. 
                                            // This is a attempt to manipulate the ports directly. 
   if (high) { 
@@ -90,6 +123,8 @@ void checkCharge() {
   {
     digitalWrite(GREEN_LED_PIN, LOW);    
   }
+  if (DEBUG) Serial.print("charge: ");
+  if (DEBUG) Serial.println(chargeState);
 }
 
 int readSwitch() {
@@ -150,38 +185,70 @@ int readSwitch() {
 
 void loopAcc() { // Read the accelerometer once at 120hz
   if (accTime<time) {
-    accTime = time + 9;
+    accTime = time + 20;
     readAccXYZ();
   }
 }
 
 void readAccXYZ() { // TODO: read the accelerometer
-  
-  byte val[3];
+  //if (DEBUG) Serial.println("ReadAccXYZ");
+  unsigned char val[3];
   int count = 0;
   val[0] = val[1] = val[2] = 64;
   
   Wire.requestFrom((int)MMA7660_ADDRESS, 3);
-  
+  //if (DEBUG) Serial.println("request sent");
   while(Wire.available()) {
+    //if (DEBUG) Serial.print(",");
     if(count < 3) {
-      while(val[count] > 63) {
+      //while(val[count] > 63) {
+        //if (DEBUG) Serial.print(".");
         val[count] = Wire.read();
-      }
+      //}
       count++;
     }
   }
   
+  
+  //if (DEBUG) Serial.println("read loop completed");
   // Shift the values left 2 is the same as x*2*2 and divide by 4 seems to get the same results
   // BUT! the value returned by the accelerometer is a signed 6-bit value, and the 5th bit is the positive/negative bit
   // We move the signed bit up to the 8th bit and create a valid signed 8-bit number, then we divide it by 4.
-  x = (val[0]<<2)/4; 
-  y = (val[1]<<2)/4;
-  z = (val[2]<<2)/4;
+  x = ((char)(val[0]<<2))/4;
+  y = ((char)(val[1]<<2))/4;
+  z = ((char)(val[2]<<2))/4;
+  
+  if (DEBUG) Serial.print("x");
+  if (DEBUG) Serial.print(x);
+  if (DEBUG) Serial.print(" y");
+  if (DEBUG) Serial.print(y);
+  if (DEBUG) Serial.print(" z");
+  if (DEBUG) Serial.println(z);
   // The resulting x y z values are from -32 to +31 where 21.33 is 1g 
 }
 
+
 void startAcc() {
+/*
+  // Configure accelerometer
+  byte config[] = {
+    ACC_REG_INTS,  // First register (see next line)
+    0xE4,  // Interrupts: shakes, taps
+    0x00,  // Mode: not enabled yet
+    0x00,  // Sample rate: 120 Hz
+    0x0F,  // Tap threshold
+    0x05   // Tap debounce samples
+  };
+  Wire.beginTransmission(ACC_ADDRESS);
+  Wire.write(config, sizeof(config));
+  Wire.endTransmission();
+
+  // Enable accelerometer
+  byte enable[] = {ACC_REG_MODE, 0x01};  // Mode: active!
+  Wire.beginTransmission(ACC_ADDRESS);
+  Wire.write(enable, sizeof(enable));
+  Wire.endTransmission();
+  */
   Wire.beginTransmission(MMA7660_ADDRESS); // transmit to device
   Wire.write((byte)0x00);                // try to send data
 

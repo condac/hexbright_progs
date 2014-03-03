@@ -1,6 +1,7 @@
 
 
 #include "configuration.h"
+#include <Wire.h>
 
 // Modes
 #define MODE_MOON               0
@@ -26,6 +27,7 @@ void setup() {
   pinMode(SW_PIN,INPUT);
   digitalWrite(SW_PIN,PULLUP); // pull up ?
   pinMode(LED_DRIVER_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
   pinMode(LED_PWM_PIN,   OUTPUT);
   digitalWrite(LED_DRIVER_PIN, LOW);
   digitalWrite(LED_PWM_PIN,   LOW);
@@ -34,12 +36,19 @@ void setup() {
     setPower(true);
   }
   else { // if not its is turned on by connecting the usb to power to a computer or charger
-    if (DEBUG) {
+    
+  }
+  
+  if (DEBUG) {
       Serial.begin(9600);
       Serial.println("Connected!");
     }
-  }
   startAcc();
+  
+  if (DEBUG) {
+      Serial.println("Init done");
+  }
+  //setLight(4,0);
 }
 
 void loop() {
@@ -66,16 +75,19 @@ void loop() {
   }
   else if (buttonTime > 50) { //Simple cycle through modes
     mode++;
-    if (DEBUG) Serial.print("modechanged");
-    if (DEBUG) Serial.println(buttonTime);
+    
     
     if (mode>maxMode) {
       mode = 0;
     }
+    if (DEBUG) Serial.print("modechanged");
+    if (DEBUG) Serial.println(mode);
   }
   
   loopAcc();
   modeCase(); // 
+  checkCharge();
+  heatProtection();
 }
   
 void buttonDown(long buttonTime) {
@@ -95,7 +107,8 @@ void modeCase() {
   switch (mode)
   {
   case MODE_MOON:
-    moon();
+    //moon();
+    tactical();
     break;
   case MODE_LOW:
     setLight(128,0);
@@ -111,6 +124,9 @@ void modeCase() {
     break;
   case MODE_BEACON:
     beacon();
+    break;  
+  case MODE_DISCO:
+    disco();
     break;  
   }
 }

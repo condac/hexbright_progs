@@ -5,6 +5,7 @@ extern unsigned long time;
 int moonCounter = 0;
 boolean flipp;
 extern int mode;
+int tactPrev = 0;
 
 void beacon() { // creates a light pulse every second
   if ((time&0x03FF)?0:1) {
@@ -18,16 +19,7 @@ void beacon() { // creates a light pulse every second
 void moon() {
   
   // atempt to make light even more weak than 1 pwm
-  digitalWrite(LED_DRIVER_PIN,LOW);
-  
-  if (flipp) {
-    //analogWrite(LED_PWM_PIN, 0);
-    flipp=false;
-  }
-  else {
-    analogWrite(LED_PWM_PIN, 1);
-    flipp=true;
-  }
+  setLight(4,0);
 }
 
 // ######################################################################################
@@ -71,7 +63,12 @@ void disco() {
   
   totalForce = ax+ay+az; // At rest this should add up to 21.33 (but we dont have decimals of cource)
   
-  intensity = (totalForce-21)*10;
+  intensity = (totalForce-31)*1;
+  
+  if (DEBUG) Serial.print("               Disco:");
+  if (DEBUG) Serial.print(totalForce);
+  if (DEBUG) Serial.print(" int:");
+  if (DEBUG) Serial.println(intensity);
   
   if (intensity>255) {
     intensity = 255;
@@ -87,7 +84,22 @@ void disco() {
     setLight(0,1);
   }
   else {
-    setLightFast(intensity,1);
+    setLight(intensity,1);
   }
   
+}
+
+void tactical() {
+  extern int y;
+  int out = 512-(abs(y)* 26);
+  if (out <0) {
+    out = 0;
+  }
+  tactPrev = ( (tactPrev*2) + out )/3;
+  setLight(tactPrev);
+  
+  if (DEBUG) Serial.print("               Tactical:");
+  if (DEBUG) Serial.print(out);
+  if (DEBUG) Serial.print(" prev:");
+  if (DEBUG) Serial.println(tactPrev);
 }
